@@ -1,6 +1,6 @@
 ## ใช้ docker สร้้างสภาพแวดล้อม 
 ## database : php
-## ลง wsl เพื่อเข้า docker
+## ลงinstall wsl เพื่อเข้า docker
 
 ## ลง docker
 ## ลงเสร็จไป clone 
