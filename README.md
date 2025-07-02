@@ -13,12 +13,12 @@ docker-compose up
 
 ## http://localhost:8000 คือ phpmyadmin
 MYSQL_USER
-```
+
 MYSQL_DATABASE
-```
+
 MYSQL_PASSWORD
-```
+
 MYSQL_ROOT_PASSWORD
-```
+
 
 
