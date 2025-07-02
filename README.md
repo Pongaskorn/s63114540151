@@ -39,10 +39,12 @@ MYSQL_ROOT_PASSWORD
 
 ## phpmyadmin ถ้าเข้าครั้งแรก
 MYSQL_USER
+
 MYSQL_PASSWORD
 
 ## กรณีเข้าแล้วเพิ่ม หรือNew tableไม่ได้ ให้กดlogoutออกแล้วเข้าใหม่โดยใช้
 root
+
 MYSQL_ROOT_PASSWORD
 
 
