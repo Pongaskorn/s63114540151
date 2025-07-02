@@ -1,24 +1,24 @@
-# php-apache-mysql-docker
+## ใช้ docker สร้้างสภาพแวดล้อม 
+## database : php
 
-## How to use 
+## ลง docker
+## ลงเสร็จไป clone 
+## clone เสร็จไป ใช้คำสั่ง docker-compose up
 ```
 docker-compose up
 ```
+## พอรันเสร็จ เข้าhttp://localhost:8080
 
-## How to login to phpmyadmin
-Use this username and password to login as root 
 
-Username 
+
+## http://localhost:8000 คือ phpmyadmin
+MYSQL_USER
 ```
-root
+MYSQL_DATABASE
 ```
-Password
+MYSQL_PASSWORD
 ```
 MYSQL_ROOT_PASSWORD
 ```
 
-## How to create new folder
-You can create new project inside src folder 
-```
-php/src/[your-project]
-```
+
