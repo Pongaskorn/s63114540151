@@ -1,34 +1,91 @@
-version: '3.8'
+version: "3.8"
+
 services:
-  php-apache-environment:
-    container_name: php-apache
-    build: 
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./init_data.sql:/docker-entrypoint-initdb.d/init_data.sql
+    ports:
+      - "5432:5432"                # bind port ให้ host 202.28.49.122 เข้าถึงได้
+    networks:
+      - prod_net
+
+  php:
+    build:
       context: ./php
       dockerfile: Dockerfile
+    container_name: php_app
+    restart: always
     depends_on:
       - db
+    environment:
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+      APP_ENV: production          # ตั้งค่า production mode
+    ports:
+      - "${APP_PORT}:80"
     volumes:
-      - ./php/src:/var/www/html/
-    ports:
-      - 8081:80
-  db:
-    container_name: db
-    image: mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: MYSQL_ROOT_PASSWORD
-      MYSQL_DATABASE: MYSQL_DATABASE
-      MYSQL_USER: MYSQL_USER
-      MYSQL_PASSWORD: MYSQL_PASSWORD
-    ports:
-      - "9906:3306"
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    ports:
-      - "8000:80"
-    restart: always
-    environment:
-      PMA_HOST: db
-    depends_on:
-      - db
-      
+      - ./php/src:/var/www/html
+    networks:
+      - prod_net
+
+networks:
+  prod_net:
+    driver: bridge
+
+
+
+# version: "3.8"
+
+# services:
+#   db:
+#     image: postgres:15
+#     container_name: postgres_db
+#     restart: always
+#     environment:
+#       POSTGRES_DB: ${POSTGRES_DB}
+#       POSTGRES_USER: ${POSTGRES_USER}
+#       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+#     volumes:
+#       - ./postgres-data:/var/lib/postgresql/data               # เก็บข้อมูลจริง
+#       - ./init_data.sql:/docker-entrypoint-initdb.d/init_data.sql
+#     ports:
+#       - "${DB_PORT_EXPOSE}:5432"                               # เปิดให้ภายนอกเชื่อมได้
+#     networks:
+#       - prod_net
+
+#   php:
+#     build:
+#       context: ./php
+#       dockerfile: Dockerfile
+#     container_name: php_app
+#     restart: always
+#     depends_on:
+#       - db
+#     environment:
+#       DB_HOST: db                                              # ใช้ service name ภายใน network
+#       DB_PORT: 5432
+#       DB_USER: ${POSTGRES_USER}
+#       DB_PASSWORD: ${POSTGRES_PASSWORD}
+#       DB_NAME: ${POSTGRES_DB}
+#     ports:
+#       - "${APP_PORT}:80"
+#     volumes:
+#       - ./php/src:/var/www/html
+#     networks:
+#       - prod_net
+
+# networks:
+#   prod_net:
+#     driver: bridge
+
+

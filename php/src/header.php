@@ -3,6 +3,7 @@ session_start();
 
 ?>
 
+
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -128,10 +129,10 @@ session_start();
                              include "db.php";
                             if(isset($_SESSION["uid"])){
                                 $sql = "SELECT first_name FROM user_info WHERE user_id='$_SESSION[uid]'";
-                                $query = mysqli_query($con,$sql);
-                                $row=mysqli_fetch_array($query);
+                                $query = pg_query($con,$sql);
+                                $row=pg_fetch_assoc($query);
                                 
-                                echo '
+                                echo '	
                                <div class="dropdownn">
                                   <a href="#" class="dropdownn" data-toggle="modal" data-target="#myModal" ><i class="fa fa-user-o"></i> HI '.$row["first_name"].'</a>
                                   <div class="dropdownn-content">
