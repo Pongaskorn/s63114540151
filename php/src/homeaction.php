@@ -3,10 +3,11 @@ session_start();
 $ip_add = getenv("REMOTE_ADDR");
 include "db.php";
 
-if(isset($_POST["categoryhome"])){
-	$category_query = "SELECT * FROM categories WHERE cat_id!=1";
+
+if (isset($_POST["categoryhome"])) {
+	// $category_query = 'SELECT * FROM "categories" WHERE "cat_id" != 1';
     
-	$run_query = mysqli_query($con,$category_query) or die(mysqli_error($con));
+	// $run_query = pg_query($con, $category_query) or die(pg_last_error($con));
 	echo "
 		
             
@@ -18,34 +19,38 @@ if(isset($_POST["categoryhome"])){
                     <li class='active'><a href='index.php'>Home</a></li>
                     <li><a href='store.php'>Electronics</a></li>
 	";
-	if(mysqli_num_rows($run_query) > 0){
-		while($row = mysqli_fetch_array($run_query)){
-			$cid = $row["cat_id"];
-			$cat_name = $row["cat_title"];
+	//  if (pg_num_rows > 0) {	
+	// 	while ($row = pg_fetch_assoc($run_query)) {
+	// 		$cid = $row["cat_id"];
+	// 		$cat_name = $row["cat_title"];
             
-            $sql = "SELECT COUNT(*) AS count_items FROM products,categories WHERE product_cat=cat_id";
-            $query = mysqli_query($con,$sql);
-            $row = mysqli_fetch_array($query);
-            $count=$row["count_items"];
+    //          $sql = '
+    //             SELECT COUNT(*) AS count_items 
+    //             FROM "products" p
+    //             JOIN "categories" c ON p."product_cat" = c."cat_id"
+    //         ';
+    //          $query = pg_query($con, $sql);
+    //         $row   = pg_fetch_assoc($query);
+    //         $count = $row["count_items"];
             
             
             
-			echo "
+		// 	echo "
 					
                     
-                               <li class='categoryhome' cid='$cid'><a href='store.php'>$cat_name</a></li>
+        //                        <li class='categoryhome' cid='$cid'><a href='store.php'>$cat_name</a></li>
                     
-			";
-		}
+		// 	";
+		// }
         
-		echo "</ul>
-					<!-- /NAV -->
-				</div>
-				<!-- /responsive-nav -->
+		// echo "</ul>
+		// 			<!-- /NAV -->
+		// 		</div>	
+		// 		<!-- /responsive-nav -->
                
-			";
+		// 	";
 	}
-}
+// }
 
 
 if(isset($_POST["page"])){
@@ -171,10 +176,24 @@ if(isset($_POST["gethomeProduct"])){
 if(isset($_POST["get_seleted_Category"]) ||  isset($_POST["search"])){
 	if(isset($_POST["get_seleted_Category"])){
 		$id = $_POST["cat_id"];
-		$sql = "SELECT * FROM products,categories WHERE product_cat = '$id' AND product_cat=cat_id";
+		$sql = '
+            SELECT p."product_id", p."product_cat", p."product_brand",
+                   p."product_title", p."product_price", p."product_image",
+                   c."cat_title"
+            FROM "products" p
+            JOIN "categories" c ON p."product_cat" = c."cat_id"
+            WHERE p."product_cat" = ' . intval($id) . '
+        ';
 	}else {
-		$keyword = $_POST["keyword"];
-		$sql = "SELECT * FROM products,categories WHERE product_cat=cat_id AND product_keywords LIKE '%$keyword%'";
+		$keyword = pg_escape_string($con, $_POST["keyword"]);
+		$sql = '
+            SELECT p."product_id", p."product_cat", p."product_brand",
+                   p."product_title", p."product_price", p."product_image",
+                   c."cat_title"
+            FROM "products" p
+            JOIN "categories" c ON p."product_cat" = c."cat_id"
+            WHERE p."product_keywords" ILIKE \'%' . $keyword . '%\'
+        ';
 	}
 	
 	$run_query = mysqli_query($con,$sql);

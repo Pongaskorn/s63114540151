@@ -147,7 +147,7 @@ INSERT INTO "order_products" ("order_pro_id", "order_id", "product_id", "qty", "
 
 
 
-CREATE TABLE "products" (
+CREATE TABLE products (
   "product_id" INTEGER NOT NULL,
   "product_cat" INTEGER NOT NULL,
   "product_brand" INTEGER NOT NULL,
