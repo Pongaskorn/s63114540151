@@ -1,0 +1,72 @@
+  version: "3.8"
+
+  services:
+    traefik:
+      image: traefik:v3.0
+      container_name: traefik
+      restart: always
+      command:
+        - "--api.dashboard=true"
+        - "--api.insecure=true" # ❌ ปิดใน production
+        - "--providers.docker=true"
+        - "--providers.docker.exposedbydefault=false"
+        - "--entrypoints.web.address=:80"
+      ports:
+        - "80:80"
+        # - "8080:8080"   # Dashboard
+      volumes:
+        - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      networks:
+        - traefik-public
+
+    db:
+      image: postgres:15
+      container_name: postgres_db
+      restart: always
+      environment:
+        POSTGRES_DB: ${POSTGRES_DB}
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      volumes:
+        - ./postgres-data:/var/lib/postgresql/data
+        - ./init_data.sql:/docker-entrypoint-initdb.d/init_data.sql
+      ports:
+        - "${DB_PORT_EXPOSE}:5432"
+      networks:
+        - traefik-public
+      
+
+    php:
+      build:
+        context: ./php
+        dockerfile: Dockerfile
+      container_name: php_app
+      restart: always
+      depends_on:
+        - db
+      environment:
+        APP_ENV: ${APP_ENV}
+        DB_HOST: db
+        DB_PORT: 5432
+        DB_USER: ${POSTGRES_USER}
+        DB_PASSWORD: ${POSTGRES_PASSWORD}
+        DB_NAME: ${POSTGRES_DB}
+      volumes:
+        - ./php/src:/var/www/html
+      
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.php_app.rule=PathPrefix(`/${STUDENT_ID}`)"
+        - "traefik.http.routers.php_app.entrypoints=web"
+        - "traefik.http.services.php_app.loadbalancer.server.port=80"
+        - "traefik.http.middlewares.strip-prefix.stripprefix.prefixes=/${STUDENT_ID}"
+        - "traefik.http.routers.php_app.middlewares=strip-prefix"
+      networks:
+        - traefik-public
+
+  volumes:
+    static_share:
+
+  networks:
+    traefik-public:
+      external: true
